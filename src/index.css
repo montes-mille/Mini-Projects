@@ -1,0 +1,91 @@
+/* Base reset, fonts, and the hover/animation behaviors the inline styles can't express. */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #fbfaf7;
+  font-family: 'Public Sans', system-ui, sans-serif;
+  color: #1b2733;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: #13294b;
+}
+a:hover {
+  color: #8a6d1f;
+}
+
+input,
+select {
+  font-family: 'Public Sans', system-ui, sans-serif;
+}
+input:focus,
+select:focus {
+  outline: none;
+}
+
+/* ---- Hover behaviors (from the prototype's style-hover attributes) ---- */
+
+/* Gold-outline buttons (Export, Reviewed today): fill gold, navy text on hover. */
+.btn-gold-outline {
+  border: 1.5px solid #c9a227;
+  color: #c9a227;
+  transition: background 0.12s, color 0.12s;
+}
+.btn-gold-outline:hover {
+  background: #c9a227;
+  color: #13294b;
+}
+
+/* Import button: muted outline → gold border + gold text on hover. */
+.btn-ghost {
+  border: 1.5px solid rgba(255, 255, 255, 0.35);
+  color: #c7d3e0;
+  transition: border-color 0.12s, color 0.12s;
+}
+.btn-ghost:hover {
+  border-color: #c9a227;
+  color: #c9a227;
+}
+
+/* Navy "Add" button. */
+.btn-navy {
+  background: #13294b;
+  transition: background 0.12s;
+}
+.btn-navy:hover {
+  background: #1a3560;
+}
+
+/* Item row hover tint. */
+.item-row {
+  transition: background 0.1s;
+}
+.item-row:hover {
+  background: #f5f2ea !important;
+}
+
+/* Delete glyph turns red on hover. */
+.delete-x {
+  color: #c9c3b4;
+  transition: color 0.1s;
+}
+.delete-x:hover {
+  color: #a34141;
+}
+
+/* Toast entrance. */
+@keyframes toastin {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

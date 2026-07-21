@@ -7,7 +7,9 @@ click-to-cycle status/priority, review-cadence tracking, summary KPIs, a
 progress-by-category chart, and lossless **Excel (.xlsx) export/import** so the
 same spreadsheet can be edited in Excel and re-synced to the dashboard.
 
-Built with **React + Vite**, using **SheetJS (`xlsx`)** for the Excel round-trip.
+Two interchangeable views share the same data: a **Kanban board** (default) and a
+row-based **list**. Built with **React + Vite**, using **SheetJS (`xlsx`)** for
+the Excel round-trip.
 
 ## Getting started
 
@@ -22,6 +24,13 @@ npm run test:watch # run tests in watch mode
 
 ## Features
 
+- **Two views** (toggle in the controls bar):
+  - **Board** (default): a Kanban board with one column per status — Not started
+    / In progress / Blocked / Done. **Drag a card between columns to change its
+    status.** Cards show a category tag (◆ Task / ⚑ Risk / ✓ Commit), owner, due
+    date (with overdue flag), and priority. A quick-add bar with a category
+    selector creates Not-started cards.
+  - **List**: the row-based dashboard grouped by the three categories.
 - **Three categories** with per-category quick-add (button or Enter key).
 - **Inline editing** of description, owner, and due date — saved on change and
   persisted to `localStorage` (key `actionplan-v1`).
@@ -33,10 +42,11 @@ npm run test:watch # run tests in watch mode
 - **Review cadence**: next-review date computed from an anchor advanced by
   7 / 14 / 30 days; "Reviewed today" resets the anchor.
 - **Overdue** items (due before today, not done) are flagged in red.
-- **Search & filter**: a controls bar filters the item rows by free-text search
-  (description or owner) and by owner / priority / status, with a clear-filters
-  action and a "N of M shown" note. KPIs and the category chart always reflect
-  the full plan, not the filtered view.
+- **Search & filter**: a controls bar filters items by free-text search
+  (description or owner) and by category / owner / priority / status, with a
+  clear-filters action and a "N of M shown" note. (The status filter is hidden on
+  the board, where the columns already represent status.) KPIs and the category
+  chart always reflect the full plan, not the filtered view.
 - **Display options**: toggle "Show / Hide completed" and row "Comfortable /
   Compact" density. These are view state and are not persisted.
 
@@ -78,9 +88,11 @@ src/
     Header.jsx              Navy header: brand, export/import, cadence
     SummaryStrip.jsx        Five KPI segments
     CategoryChart.jsx       Stacked progress-by-category columns
-    ControlsBar.jsx         Search, filters, and display options
-    CategorySection.jsx     Heading, quick-add, column header, rows
-    ItemRow.jsx             Single action row
+    ControlsBar.jsx         View toggle, search, filters, display options
+    KanbanBoard.jsx         Status-column board with drag-and-drop + quick-add
+    KanbanCard.jsx          Draggable card
+    CategorySection.jsx     List view: heading, quick-add, column header, rows
+    ItemRow.jsx             List view: single action row
     Footer.jsx              Attribution + date
     Toast.jsx               Transient confirmation/error toast
 ```

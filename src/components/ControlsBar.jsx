@@ -2,7 +2,7 @@
 // and the display options (show completed, density). View state only — nothing
 // here is persisted.
 
-import { C, FONT, STATUSES, PRIORITIES } from '../constants.js'
+import { C, FONT, STATUSES, PRIORITIES, CATEGORIES } from '../constants.js'
 
 const labelStyle = {
   fontSize: 10.5,
@@ -58,7 +58,9 @@ function Toggle({ options, value, onChange }) {
 }
 
 export default function ControlsBar({
+  view,
   search,
+  category,
   owner,
   priority,
   status,
@@ -67,7 +69,9 @@ export default function ControlsBar({
   showCompleted,
   density,
   matchNote,
+  onView,
   onSearch,
+  onCategory,
   onOwner,
   onPriority,
   onStatus,
@@ -75,6 +79,7 @@ export default function ControlsBar({
   onToggleCompleted,
   onDensity,
 }) {
+  const boardView = view === 'board'
   return (
     <div
       style={{
@@ -89,8 +94,21 @@ export default function ControlsBar({
         flexWrap: 'wrap',
       }}
     >
+      {/* View toggle */}
+      <label style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+        <span style={labelStyle}>View</span>
+        <Toggle
+          value={view}
+          onChange={onView}
+          options={[
+            { value: 'board', label: 'Board' },
+            { value: 'list', label: 'List' },
+          ]}
+        />
+      </label>
+
       {/* Search */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '1 1 220px', minWidth: 200 }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flex: '1 1 200px', minWidth: 180 }}>
         <span style={{ color: C.faint, fontSize: 14 }}>⌕</span>
         <input
           value={search}
@@ -105,6 +123,19 @@ export default function ControlsBar({
           }}
         />
       </div>
+
+      {/* Category */}
+      <label style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+        <span style={labelStyle}>Category</span>
+        <select value={category} onChange={(e) => onCategory(e.target.value)} style={selectStyle}>
+          <option value="all">All</option>
+          {CATEGORIES.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      </label>
 
       {/* Owner */}
       <label style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
@@ -132,18 +163,20 @@ export default function ControlsBar({
         </select>
       </label>
 
-      {/* Status */}
-      <label style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
-        <span style={labelStyle}>Status</span>
-        <select value={status} onChange={(e) => onStatus(e.target.value)} style={selectStyle}>
-          <option value="all">All</option>
-          {STATUSES.map((s) => (
-            <option key={s} value={s}>
-              {s}
-            </option>
-          ))}
-        </select>
-      </label>
+      {/* Status — hidden in board view, where the columns are the statuses. */}
+      {!boardView && (
+        <label style={{ display: 'flex', alignItems: 'center', gap: 7 }}>
+          <span style={labelStyle}>Status</span>
+          <select value={status} onChange={(e) => onStatus(e.target.value)} style={selectStyle}>
+            <option value="all">All</option>
+            {STATUSES.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
 
       {/* Clear filters */}
       {filtersActive && (

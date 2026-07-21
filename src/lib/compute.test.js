@@ -176,6 +176,16 @@ describe('filterItems', () => {
     expect(filterItems(items, { status: 'Done' })).toHaveLength(1)
   })
 
+  it('filters by category', () => {
+    const mixed = [
+      item({ cat: 'tasks', desc: 't' }),
+      item({ cat: 'risks', desc: 'r' }),
+      item({ cat: 'commitments', desc: 'c' }),
+    ]
+    expect(filterItems(mixed, { category: 'risks' }).map((i) => i.desc)).toEqual(['r'])
+    expect(filterItems(mixed, { category: 'all' })).toHaveLength(3)
+  })
+
   it('combines multiple constraints (AND)', () => {
     expect(filterItems(items, { priority: 'A', status: 'Not started' })).toHaveLength(1)
     expect(filterItems(items, { priority: 'A', status: 'Done' })).toHaveLength(0)
@@ -203,6 +213,7 @@ describe('hasActiveFilters', () => {
 
   it('is true when any constraint is set', () => {
     expect(hasActiveFilters({ search: 'x' })).toBe(true)
+    expect(hasActiveFilters({ category: 'tasks' })).toBe(true)
     expect(hasActiveFilters({ owner: 'A. Montes' })).toBe(true)
     expect(hasActiveFilters({ priority: 'A' })).toBe(true)
     expect(hasActiveFilters({ status: 'Done' })).toBe(true)

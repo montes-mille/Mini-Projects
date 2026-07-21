@@ -78,13 +78,17 @@ export function computeBars(items) {
   })
 }
 
-// Filter a list of items by a free-text query and optional owner/priority/status.
-// Empty/'all' filter values are treated as "no constraint". Search matches the
-// description and owner (case-insensitive).
-export function filterItems(list, { search = '', owner = 'all', priority = 'all', status = 'all' } = {}) {
+// Filter a list of items by a free-text query and optional
+// category/owner/priority/status. Empty/'all' filter values are treated as "no
+// constraint". Search matches the description and owner (case-insensitive).
+export function filterItems(
+  list,
+  { search = '', category = 'all', owner = 'all', priority = 'all', status = 'all' } = {},
+) {
   const q = search.trim().toLowerCase()
   return list.filter((i) => {
     if (q && !`${i.desc} ${i.owner}`.toLowerCase().includes(q)) return false
+    if (category !== 'all' && i.cat !== category) return false
     if (owner !== 'all' && i.owner !== owner) return false
     if (priority !== 'all' && i.pri !== priority) return false
     if (status !== 'all' && i.status !== status) return false
@@ -100,8 +104,20 @@ export function distinctOwners(items) {
 }
 
 // True when any filter/search constraint is active.
-export function hasActiveFilters({ search = '', owner = 'all', priority = 'all', status = 'all' } = {}) {
-  return !!search.trim() || owner !== 'all' || priority !== 'all' || status !== 'all'
+export function hasActiveFilters({
+  search = '',
+  category = 'all',
+  owner = 'all',
+  priority = 'all',
+  status = 'all',
+} = {}) {
+  return (
+    !!search.trim() ||
+    category !== 'all' ||
+    owner !== 'all' ||
+    priority !== 'all' ||
+    status !== 'all'
+  )
 }
 
 // Next review date: advance the anchor by the cadence step until it is >= today.

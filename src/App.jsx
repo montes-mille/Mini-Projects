@@ -20,17 +20,25 @@ import SummaryStrip from './components/SummaryStrip.jsx'
 import CategoryChart from './components/CategoryChart.jsx'
 import ControlsBar from './components/ControlsBar.jsx'
 import CategorySection from './components/CategorySection.jsx'
+import KanbanBoard from './components/KanbanBoard.jsx'
 import Footer from './components/Footer.jsx'
 import Toast from './components/Toast.jsx'
 
-const EMPTY_FILTERS = { search: '', owner: 'all', priority: 'all', status: 'all' }
+const EMPTY_FILTERS = { search: '', category: 'all', owner: 'all', priority: 'all', status: 'all' }
 
 export default function App() {
   // Display + filter options are view state — not persisted (per the handoff).
+  const [view, setView] = useState('board')
   const [showCompleted, setShowCompleted] = useState(true)
   const [density, setDensity] = useState('comfortable')
   const [filters, setFilters] = useState(EMPTY_FILTERS)
   const setFilter = (key, value) => setFilters((f) => ({ ...f, [key]: value }))
+
+  // Switching to the board clears any status filter — the columns are the statuses.
+  const changeView = (next) => {
+    if (next === 'board') setFilters((f) => ({ ...f, status: 'all' }))
+    setView(next)
+  }
 
   const {
     state,
@@ -79,8 +87,17 @@ export default function App() {
     [items, showCompleted, filters],
   )
 
-  // Total rows shown vs. total items, surfaced as a note while filtering.
-  const shownCount = sections.reduce((n, s) => n + s.items.length, 0)
+  // Board items: same search/category/owner/priority filters as the list, but the
+  // status filter is ignored (columns represent status). showCompleted still hides
+  // Done cards when off.
+  const boardItems = useMemo(() => {
+    const base = showCompleted ? items : items.filter((i) => i.status !== 'Done')
+    return filterItems(base, { ...filters, status: 'all' })
+  }, [items, showCompleted, filters])
+
+  // Rows/cards shown vs. total items, surfaced as a note while filtering.
+  const shownCount =
+    view === 'board' ? boardItems.length : sections.reduce((n, s) => n + s.items.length, 0)
   const matchNote = filtersActive ? `${shownCount} of ${items.length} shown` : ''
 
   const nextReview = useMemo(() => {
@@ -166,7 +183,9 @@ export default function App() {
         <CategoryChart bars={bars} />
 
         <ControlsBar
+          view={view}
           search={filters.search}
+          category={filters.category}
           owner={filters.owner}
           priority={filters.priority}
           status={filters.status}
@@ -175,7 +194,9 @@ export default function App() {
           showCompleted={showCompleted}
           density={density}
           matchNote={matchNote}
+          onView={changeView}
           onSearch={(v) => setFilter('search', v)}
+          onCategory={(v) => setFilter('category', v)}
           onOwner={(v) => setFilter('owner', v)}
           onPriority={(v) => setFilter('priority', v)}
           onStatus={(v) => setFilter('status', v)}
@@ -184,24 +205,34 @@ export default function App() {
           onDensity={setDensity}
         />
 
-        {sections.map((s) => (
-          <CategorySection
-            key={s.category.id}
-            category={s.category}
-            items={s.items}
-            total={s.total}
-            doneCount={s.doneCount}
-            draft={drafts[s.category.id]}
-            rowPad={rowPad}
-            emptyMessage={s.emptyMessage}
-            onDraftChange={setDraft}
-            onAdd={addItem}
-            onCycleStatus={cycleStatus}
-            onCyclePri={cyclePriority}
+        {view === 'board' ? (
+          <KanbanBoard
+            items={boardItems}
+            density={density}
             onUpdate={updateItem}
             onRemove={removeItem}
+            onAdd={addItem}
           />
-        ))}
+        ) : (
+          sections.map((s) => (
+            <CategorySection
+              key={s.category.id}
+              category={s.category}
+              items={s.items}
+              total={s.total}
+              doneCount={s.doneCount}
+              draft={drafts[s.category.id]}
+              rowPad={rowPad}
+              emptyMessage={s.emptyMessage}
+              onDraftChange={setDraft}
+              onAdd={addItem}
+              onCycleStatus={cycleStatus}
+              onCyclePri={cyclePriority}
+              onUpdate={updateItem}
+              onRemove={removeItem}
+            />
+          ))
+        )}
       </div>
 
       <Footer todayLabel={todayLabel} />

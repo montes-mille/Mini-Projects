@@ -41,6 +41,21 @@ export const CATEGORY_NAMES = {
 
 export const CADENCE_STEP = { weekly: 7, biweekly: 14, monthly: 30 }
 
+// Per-status presentation for the Kanban columns (accent = column header/rail color).
+export const STATUS_META = {
+  'Not started': { accent: '#C9C3B4', tint: '#F4F2EC' },
+  'In progress': { accent: '#13294B', tint: '#EDF0F5' },
+  Blocked: { accent: '#A34141', tint: '#F7ECEC' },
+  Done: { accent: '#C9A227', tint: '#F7F1DE' },
+}
+
+// Per-category tag presentation for cards (glyph comes from CATEGORIES).
+export const CATEGORY_META = {
+  tasks: { short: 'Task', color: '#13294B' },
+  risks: { short: 'Risk', color: '#A34141' },
+  commitments: { short: 'Commit', color: '#8A6D1F' },
+}
+
 // Design tokens — see "Design Tokens" section of the handoff README.
 export const C = {
   navy: '#13294B',

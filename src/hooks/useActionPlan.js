@@ -56,9 +56,12 @@ export function useActionPlan() {
   }, [])
 
   // ---- Item mutations ----
-  const addItem = useCallback((cat) => {
+  // Add an item to a category. With no descOverride, consumes that category's
+  // quick-add draft (list view); with descOverride, adds it directly (board view).
+  const addItem = useCallback((cat, descOverride) => {
     setState((s) => {
-      const desc = (s.drafts[cat] || '').trim()
+      const fromDraft = descOverride === undefined
+      const desc = (fromDraft ? s.drafts[cat] || '' : descOverride).trim()
       if (!desc) return s
       const item = {
         id: Date.now() + Math.random(),
@@ -69,7 +72,8 @@ export function useActionPlan() {
         status: 'Not started',
         pri: 'B',
       }
-      return { ...s, items: [...s.items, item], drafts: { ...s.drafts, [cat]: '' } }
+      const drafts = fromDraft ? { ...s.drafts, [cat]: '' } : s.drafts
+      return { ...s, items: [...s.items, item], drafts }
     })
   }, [])
 

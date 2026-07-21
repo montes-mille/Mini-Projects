@@ -13,9 +13,11 @@ Built with **React + Vite**, using **SheetJS (`xlsx`)** for the Excel round-trip
 
 ```bash
 npm install
-npm run dev      # start the dev server (http://localhost:5173)
-npm run build    # production build to dist/
-npm run preview  # preview the production build
+npm run dev        # start the dev server (http://localhost:5173)
+npm run build      # production build to dist/
+npm run preview    # preview the production build
+npm test           # run the unit test suite (Vitest)
+npm run test:watch # run tests in watch mode
 ```
 
 ## Features
@@ -31,6 +33,12 @@ npm run preview  # preview the production build
 - **Review cadence**: next-review date computed from an anchor advanced by
   7 / 14 / 30 days; "Reviewed today" resets the anchor.
 - **Overdue** items (due before today, not done) are flagged in red.
+- **Search & filter**: a controls bar filters the item rows by free-text search
+  (description or owner) and by owner / priority / status, with a clear-filters
+  action and a "N of M shown" note. KPIs and the category chart always reflect
+  the full plan, not the filtered view.
+- **Display options**: toggle "Show / Hide completed" and row "Comfortable /
+  Compact" density. These are view state and are not persisted.
 
 ## Excel round-trip
 
@@ -62,14 +70,32 @@ src/
   hooks/
     useActionPlan.js        State container + localStorage persistence
   lib/
-    compute.js              Date math, KPIs, sorting, chart geometry
+    compute.js              Date math, KPIs, sorting, filtering, chart geometry
+    compute.test.js         Unit tests for compute.js
     excel.js                SheetJS export/import
+    excel.test.js           Unit tests for the Excel round-trip
   components/
     Header.jsx              Navy header: brand, export/import, cadence
     SummaryStrip.jsx        Five KPI segments
     CategoryChart.jsx       Stacked progress-by-category columns
+    ControlsBar.jsx         Search, filters, and display options
     CategorySection.jsx     Heading, quick-add, column header, rows
     ItemRow.jsx             Single action row
     Footer.jsx              Attribution + date
     Toast.jsx               Transient confirmation/error toast
+```
+
+## Tests
+
+Unit tests (Vitest) cover the pure logic:
+
+- `compute.js` — sorting order, KPI counts, chart geometry, filtering, distinct
+  owners, and review-date math (with a pinned clock).
+- `excel.js` — workbook structure (sheet names, header, grouping, ISO-text
+  dates), a full export → import round-trip, tolerant import parsing
+  (category/status/priority fuzzing, empty-action skipping, sheet fallback), and
+  `normalizeDue` across ISO / Excel-serial / date-string / blank inputs.
+
+```bash
+npm test
 ```

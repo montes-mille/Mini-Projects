@@ -2,28 +2,36 @@
 // Composes the header, summary KPIs, category chart, and the three category
 // sections, and wires the Excel export/import round-trip.
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { CATEGORIES } from './constants.js'
 import { useActionPlan } from './hooks/useActionPlan.js'
 import {
   computeKpis,
   computeBars,
   sortItems,
+  filterItems,
+  distinctOwners,
+  hasActiveFilters,
   nextReviewDate,
 } from './lib/compute.js'
 import { exportWorkbook, importWorkbook } from './lib/excel.js'
 import Header from './components/Header.jsx'
 import SummaryStrip from './components/SummaryStrip.jsx'
 import CategoryChart from './components/CategoryChart.jsx'
+import ControlsBar from './components/ControlsBar.jsx'
 import CategorySection from './components/CategorySection.jsx'
 import Footer from './components/Footer.jsx'
 import Toast from './components/Toast.jsx'
 
-// Display options (settings, not persisted) — see handoff "State Management".
-const DEFAULT_OPTIONS = { showCompleted: true, density: 'comfortable' }
+const EMPTY_FILTERS = { search: '', owner: 'all', priority: 'all', status: 'all' }
 
-export default function App({ options = DEFAULT_OPTIONS }) {
-  const { showCompleted, density } = { ...DEFAULT_OPTIONS, ...options }
+export default function App() {
+  // Display + filter options are view state — not persisted (per the handoff).
+  const [showCompleted, setShowCompleted] = useState(true)
+  const [density, setDensity] = useState('comfortable')
+  const [filters, setFilters] = useState(EMPTY_FILTERS)
+  const setFilter = (key, value) => setFilters((f) => ({ ...f, [key]: value }))
+
   const {
     state,
     toast,
@@ -42,23 +50,38 @@ export default function App({ options = DEFAULT_OPTIONS }) {
   const { items, cadence, anchor, drafts } = state
 
   // ---- Derived values ----
+  // KPIs and the category chart always reflect the full plan, not the filtered view.
   const kpis = useMemo(() => computeKpis(items), [items])
   const bars = useMemo(() => computeBars(items), [items])
+
+  const filtersActive = hasActiveFilters(filters)
+  const owners = useMemo(() => distinctOwners(items), [items])
 
   const sections = useMemo(
     () =>
       CATEGORIES.map((c) => {
         const all = items.filter((i) => i.cat === c.id)
-        const visible = showCompleted ? all : all.filter((i) => i.status !== 'Done')
+        let visible = showCompleted ? all : all.filter((i) => i.status !== 'Done')
+        visible = filterItems(visible, filters)
+        // Distinguish "no matches" (category has items) from a genuinely empty category.
+        const emptyMessage =
+          all.length > 0 && visible.length === 0
+            ? 'No matching actions — adjust the search or filters above.'
+            : undefined
         return {
           category: c,
           total: all.length,
           doneCount: all.filter((i) => i.status === 'Done').length,
           items: sortItems(visible),
+          emptyMessage,
         }
       }),
-    [items, showCompleted],
+    [items, showCompleted, filters],
   )
+
+  // Total rows shown vs. total items, surfaced as a note while filtering.
+  const shownCount = sections.reduce((n, s) => n + s.items.length, 0)
+  const matchNote = filtersActive ? `${shownCount} of ${items.length} shown` : ''
 
   const nextReview = useMemo(() => {
     return nextReviewDate(anchor, cadence).toLocaleDateString('en-US', {
@@ -142,6 +165,25 @@ export default function App({ options = DEFAULT_OPTIONS }) {
         <SummaryStrip kpis={kpis} />
         <CategoryChart bars={bars} />
 
+        <ControlsBar
+          search={filters.search}
+          owner={filters.owner}
+          priority={filters.priority}
+          status={filters.status}
+          owners={owners}
+          filtersActive={filtersActive}
+          showCompleted={showCompleted}
+          density={density}
+          matchNote={matchNote}
+          onSearch={(v) => setFilter('search', v)}
+          onOwner={(v) => setFilter('owner', v)}
+          onPriority={(v) => setFilter('priority', v)}
+          onStatus={(v) => setFilter('status', v)}
+          onClear={() => setFilters(EMPTY_FILTERS)}
+          onToggleCompleted={setShowCompleted}
+          onDensity={setDensity}
+        />
+
         {sections.map((s) => (
           <CategorySection
             key={s.category.id}
@@ -151,6 +193,7 @@ export default function App({ options = DEFAULT_OPTIONS }) {
             doneCount={s.doneCount}
             draft={drafts[s.category.id]}
             rowPad={rowPad}
+            emptyMessage={s.emptyMessage}
             onDraftChange={setDraft}
             onAdd={addItem}
             onCycleStatus={cycleStatus}

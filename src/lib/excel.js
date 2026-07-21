@@ -10,10 +10,9 @@ const EXPORT_NAME = 'Team Action Plan.xlsx'
 
 // ---- Export ----------------------------------------------------------------
 
-// Build the workbook and trigger a download. Uses showSaveFilePicker when
-// available (user picks location), else falls back to a plain download.
-// Returns 'saved' | 'downloaded' | 'cancelled'.
-export async function exportWorkbook(items, cadence, anchor) {
+// Build the Action Plan + Settings workbook from state. Pure (no DOM) so it can
+// be unit-tested. Grouped tasks → risks → commitments; Due stored as ISO text.
+export function buildWorkbook(items, cadence, anchor) {
   const rows = [HEADER]
   for (const cat of ['tasks', 'risks', 'commitments']) {
     for (const i of items.filter((x) => x.cat === cat)) {
@@ -33,6 +32,14 @@ export async function exportWorkbook(items, cadence, anchor) {
   ])
   XLSX.utils.book_append_sheet(wb, settingsSheet, 'Settings')
 
+  return wb
+}
+
+// Build the workbook and trigger a download. Uses showSaveFilePicker when
+// available (user picks location), else falls back to a plain download.
+// Returns 'saved' | 'downloaded' | 'cancelled'.
+export async function exportWorkbook(items, cadence, anchor) {
+  const wb = buildWorkbook(items, cadence, anchor)
   const blob = workbookToBlob(wb)
 
   if (window.showSaveFilePicker) {
@@ -130,10 +137,16 @@ function normalizePriority(raw) {
 }
 
 // Parse a .xlsx File. Returns { items, cadence?, anchor? }.
-// Throws when the file can't be read as a workbook; returns null items count
-// via a thrown 'NO_SHEET' when no usable Action Plan sheet exists.
+// Throws when the file can't be read as a workbook; throws 'NO_SHEET' when no
+// usable Action Plan sheet exists.
 export async function importWorkbook(file) {
   const data = await file.arrayBuffer()
+  return parseWorkbookBuffer(data)
+}
+
+// Parse a workbook from an ArrayBuffer/Uint8Array. Pure (no DOM) so it can be
+// unit-tested. Returns { items, cadence?, anchor? }.
+export function parseWorkbookBuffer(data) {
   const wb = XLSX.read(data, { type: 'array' })
 
   // Prefer the "Action Plan" sheet; else the first non-Settings sheet.

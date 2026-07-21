@@ -13,6 +13,7 @@ export default function CategorySection({
   doneCount,
   draft,
   rowPad,
+  emptyMessage,
   onDraftChange,
   onAdd,
   onCycleStatus,
@@ -21,6 +22,8 @@ export default function CategorySection({
   onRemove,
 }) {
   const countNote = total === 0 ? '' : `${doneCount} of ${total} done`
+  // Fall back to the category's default empty line when no override is given.
+  const emptyLine = emptyMessage ?? category.empty
 
   return (
     <div style={{ marginBottom: 34 }}>
@@ -122,7 +125,7 @@ export default function CategorySection({
             lineHeight: 1.5,
           }}
         >
-          {category.empty}
+          {emptyLine}
         </div>
       ) : (
         items.map((item) => (

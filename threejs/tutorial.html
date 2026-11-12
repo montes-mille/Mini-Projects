@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>three.js Tutorial</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <!-- The import map lets us write `import * as THREE from 'three'` with no build step. -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <header class="site">
+    <a class="brand" href="index.html">three.js Mini-Project</a>
+    <nav>
+      <a href="tutorial.html" aria-current="page">Tutorial</a>
+      <a href="demo.html">User Demo</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>three.js Tutorial</h1>
+    <p class="lead">
+      Six short lessons. Each one has a live viewport and, below it, the exact
+      source file that powers it (from <code>lessons/</code>). Edit a file,
+      reload, and see your change.
+    </p>
+
+    <ol class="toc">
+      <li><a href="#l1">Hello, Cube</a></li>
+      <li><a href="#l2">Geometries &amp; Materials</a></li>
+      <li><a href="#l3">Lights &amp; Shadows</a></li>
+      <li><a href="#l4">Animation &amp; the Scene Graph</a></li>
+      <li><a href="#l5">Camera Controls</a></li>
+      <li><a href="#l6">Mouse Picking</a></li>
+    </ol>
+
+    <h2>Setup</h2>
+    <p>
+      No bundler is needed. An <em>import map</em> in the page's
+      <code>&lt;head&gt;</code> tells the browser where <code>three</code> lives:
+    </p>
+<pre><code>&lt;script type="importmap"&gt;
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+  }
+}
+&lt;/script&gt;
+&lt;script type="module"&gt;
+  import * as THREE from 'three';
+&lt;/script&gt;</code></pre>
+    <p>
+      ES modules don't load from <code>file://</code>, so serve the folder:
+      <code>npx serve threejs</code> or <code>python3 -m http.server -d threejs</code>.
+    </p>
+
+    <section id="l1">
+      <h2>1. Hello, Cube</h2>
+      <p>
+        Every three.js program has a <strong>Scene</strong> (the world),
+        a <strong>Camera</strong> (the eye) and a <strong>Renderer</strong>
+        (draws the scene from the camera onto a canvas). Visible things are
+        <strong>Meshes</strong>: a geometry (shape) plus a material (look).
+      </p>
+      <div class="viewport" data-lesson="01-hello-cube"></div>
+      <pre><code data-src="lessons/01-hello-cube.js"></code></pre>
+    </section>
+
+    <section id="l2">
+      <h2>2. Geometries &amp; Materials</h2>
+      <p>
+        From here on, lessons use a tiny <code>setup()</code> helper
+        (<code>lessons/setup.js</code>) that does the Lesson 1 boilerplate for us.
+        Note how <code>MeshStandardMaterial</code> options like
+        <code>roughness</code>, <code>metalness</code>, <code>flatShading</code>
+        and <code>wireframe</code> change the look of each shape.
+      </p>
+      <div class="viewport" data-lesson="02-geometry-materials"></div>
+      <pre><code data-src="lessons/02-geometry-materials.js"></code></pre>
+    </section>
+
+    <section id="l3">
+      <h2>3. Lights &amp; Shadows</h2>
+      <p>
+        Common lights: <code>AmbientLight</code> / <code>HemisphereLight</code>
+        (soft fill), <code>DirectionalLight</code> (sun),
+        <code>PointLight</code> (bulb) and <code>SpotLight</code>.
+        Shadows are opt-in, in three places.
+      </p>
+      <div class="viewport" data-lesson="03-lights-shadows"></div>
+      <pre><code data-src="lessons/03-lights-shadows.js"></code></pre>
+    </section>
+
+    <section id="l4">
+      <h2>4. Animation &amp; the Scene Graph</h2>
+      <p>
+        Nesting objects with <code>parent.add(child)</code> builds a hierarchy.
+        Transforms stack up, so a moon orbiting a planet orbiting a sun needs
+        only three simple rotations.
+      </p>
+      <div class="viewport" data-lesson="04-animation-groups"></div>
+      <pre><code data-src="lessons/04-animation-groups.js"></code></pre>
+    </section>
+
+    <section id="l5">
+      <h2>5. Camera Controls</h2>
+      <p>
+        Extras such as controls, loaders and post-processing live in
+        <code>three/addons/</code>. Try it: <strong>drag</strong> to orbit,
+        <strong>scroll</strong> to zoom, <strong>right-drag</strong> to pan.
+      </p>
+      <div class="viewport" data-lesson="05-orbit-controls">
+        <span class="hint">Drag · scroll · right-drag</span>
+      </div>
+      <pre><code data-src="lessons/05-orbit-controls.js"></code></pre>
+    </section>
+
+    <section id="l6">
+      <h2>6. Mouse Picking</h2>
+      <p>
+        A <code>Raycaster</code> answers "what is under the mouse?".
+        Hover the spheres, then click one.
+      </p>
+      <div class="viewport" data-lesson="06-raycasting">
+        <span class="hint">Hover &amp; click</span>
+      </div>
+      <pre><code data-src="lessons/06-raycasting.js"></code></pre>
+    </section>
+
+    <h2>Next</h2>
+    <p>
+      You've now used everything the <a href="demo.html">User Demo</a> is built
+      from. Open it, play, then read <code>js/demo.js</code> to see the pieces
+      combined. For more, browse the
+      <a href="https://threejs.org/examples/" target="_blank" rel="noopener">official examples</a>
+      and <a href="https://threejs.org/docs/" target="_blank" rel="noopener">docs</a>.
+    </p>
+  </main>
+
+  <script type="module">
+    // Mount each lesson into its viewport.
+    for (const el of document.querySelectorAll('[data-lesson]')) {
+      import(`./lessons/${el.dataset.lesson}.js`)
+        .then((mod) => mod.default(el))
+        .catch((err) => {
+          el.insertAdjacentHTML('beforeend',
+            `<span class="hint">Could not load lesson: ${err.message}</span>`);
+          console.error(err);
+        });
+    }
+
+    // Show each lesson's real source code under its viewport.
+    for (const code of document.querySelectorAll('code[data-src]')) {
+      fetch(code.dataset.src)
+        .then((r) => (r.ok ? r.text() : Promise.reject(new Error(r.status))))
+        .then((text) => { code.textContent = text; })
+        .catch(() => { code.textContent = `// See ${code.dataset.src}`; });
+    }
+  </script>
+</body>
+</html>

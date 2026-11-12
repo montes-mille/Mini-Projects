@@ -1,0 +1,109 @@
+:root {
+  --bg: #0f1117;
+  --panel: #181b24;
+  --border: #2a2f3d;
+  --text: #e6e8ee;
+  --muted: #9aa2b4;
+  --accent: #4f9dff;
+  --code-bg: #11131a;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+}
+
+a { color: var(--accent); }
+
+header.site {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  padding: 0.9rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+header.site .brand { font-weight: 700; margin-right: auto; color: var(--text); text-decoration: none; }
+header.site nav a { margin-left: 1rem; text-decoration: none; }
+header.site nav a[aria-current="page"] { color: var(--text); font-weight: 600; }
+
+main { max-width: 960px; margin: 0 auto; padding: 1.5rem 1rem 4rem; }
+
+h1 { font-size: 2rem; margin: 0.5rem 0 0.25rem; }
+h2 { margin-top: 3rem; border-top: 1px solid var(--border); padding-top: 1.5rem; }
+.lead { color: var(--muted); font-size: 1.1rem; }
+
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1rem; margin-top: 2rem; }
+.card {
+  display: block;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel);
+  color: var(--text);
+  text-decoration: none;
+}
+.card:hover { border-color: var(--accent); }
+.card h3 { margin: 0 0 0.4rem; color: var(--accent); }
+.card p { margin: 0; color: var(--muted); }
+
+/* A live three.js viewport inside the tutorial */
+.viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #000;
+  margin: 1rem 0;
+}
+.viewport canvas { display: block; width: 100%; height: 100%; }
+.viewport .hint {
+  position: absolute;
+  left: 0.6rem;
+  bottom: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+  pointer-events: none;
+}
+
+pre {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  overflow-x: auto;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+code { font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace; }
+p code, li code { background: var(--code-bg); padding: 0.1rem 0.3rem; border-radius: 4px; }
+
+.toc { columns: 2; padding-left: 1.2rem; }
+@media (max-width: 600px) { .toc { columns: 1; } }
+
+/* Full-screen user demo */
+body.fullscreen { overflow: hidden; }
+body.fullscreen #app { position: fixed; inset: 0; }
+body.fullscreen header.site { position: fixed; top: 0; left: 0; right: 0; z-index: 2; background: rgba(24, 27, 36, 0.85); }
+.overlay {
+  position: fixed;
+  left: 1rem;
+  bottom: 1rem;
+  z-index: 2;
+  max-width: 320px;
+  padding: 0.75rem 1rem;
+  background: rgba(24, 27, 36, 0.85);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.overlay strong { color: var(--text); }
+.lil-gui.root { top: 64px !important; }

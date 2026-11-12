@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>three.js User Demo</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/",
+        "lil-gui": "https://cdn.jsdelivr.net/npm/lil-gui@0.20.0/dist/lil-gui.esm.min.js"
+      }
+    }
+  </script>
+</head>
+<body class="fullscreen">
+  <header class="site">
+    <a class="brand" href="index.html">three.js Mini-Project</a>
+    <nav>
+      <a href="tutorial.html">Tutorial</a>
+      <a href="demo.html" aria-current="page">User Demo</a>
+    </nav>
+  </header>
+
+  <div id="app"></div>
+
+  <div class="overlay" id="help">
+    <strong>Click the floor</strong> to drop a shape.<br />
+    <strong>Click a shape</strong> to select &amp; edit it in the panel.<br />
+    <strong>Drag</strong> to orbit · <strong>scroll</strong> to zoom ·
+    <strong>Del</strong> removes · <strong>Esc</strong> deselects.
+    <div id="status" style="margin-top:.4rem"></div>
+  </div>
+
+  <script type="module" src="js/demo.js"></script>
+</body>
+</html>
